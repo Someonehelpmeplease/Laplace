@@ -184,7 +184,22 @@ double ERROR_METRIC(double **input_array, int N, int option) {
 double **LAPLACEWCG() {
     int i, j, m, n, cnt;
     double err, rx, ry, ave, a, b, h, hx, hy, tol, max1;
-    double *X = (double *) malloc(m * sizeof(double));
+    
+
+
+    hx = 0.1;
+    hy = 0.1;
+    h = 0.1;
+    printf("Enter the number of rows: ");
+    scanf("%lf", &a);
+
+    printf("Enter the number of columns: ");
+    scanf("%lf", &b);
+
+    n = (a / hy) + 1;
+    m = (b / hx) + 1;
+	
+	double *X = (double *) malloc(m * sizeof(double));
     double *Y = (double *) malloc(n * sizeof(double));
 
     double **R = (double **) malloc(m * sizeof(double));
@@ -203,19 +218,6 @@ double **LAPLACEWCG() {
     for (i = 0; i < n; i++)
         U[i] = (double *) malloc(n * sizeof(double));
 
-
-    hx = 0.1;
-    hy = 0.1;
-    h = 0.1;
-    printf("Enter the number of rows: ");
-    scanf("%lf", &a);
-
-    printf("Enter the number of columns: ");
-    scanf("%lf", &b);
-
-    n = (a / hy) + 1;
-    m = (b / hx) + 1;
-
     for (i = 0; i <= n; i++) {
         for (j = 0; j <= m; j++) {
             U[i][j] = 1;
@@ -227,10 +229,9 @@ double **LAPLACEWCG() {
     }
     X[m] = a;
 
-    for (j = 1; j < n; j++) {
+    for (j = 0; j < n; j++) {
         Y[j] = (b - (j * hy));
     }
-    Y[0] = b;
     Y[n] = 0;
 
     for (i = 0; i <= n; i++) {
@@ -252,23 +253,23 @@ double **LAPLACEWCG() {
         }
     }
 
-    for (i = 1; i <= n; i++) {
-        U[i][1] = BDYVAL(3, Y[i]);
+    for (i = 0; i <= n; i++) {
+        U[i][0] = BDYVAL(3, Y[i]);
         U[i][m] = BDYVAL(4, Y[i]);
     }
 
-    for (j = 1; j <= m; j++) {
-        U[1][j] = BDYVAL(1, X[j]);
+    for (j = 0; j <= m; j++) {
+        U[0][j] = BDYVAL(1, X[j]);
         U[n][j] = BDYVAL(2, X[j]);
     }
 
-    U[1][1] = (U[1][2] + U[2][1]) / 2;
-    U[1][m] = (U[1][m - 1] + U[2][m]) / 2;
-    U[n][1] = (U[n - 1][1] + U[n][2]) / 2;
+    U[0][0] = (U[0][1] + U[1][0]) / 2;
+    U[0][m] = (U[0][m - 1] + U[1][m]) / 2;
+    U[n][0] = (U[n - 1][0] + U[n][1]) / 2;
     U[n][m] = (U[n - 1][m] + U[n][m - 1]) / 2;
 
-    for (j = 2; j < m; j++) {
-        for (i = 2; i < n; i++) {
+    for (j = 1; j < m; j++) {
+        for (i = 1; i < n; i++) {
             R[i][j] = (rx * U[i][j + 1] + rx * U[i][j - 1] + ry * U[i + 1][j] + ry * U[i - 1][j]
                        - 2 * (rx + ry) * U[i][j]);
         }
@@ -323,12 +324,18 @@ double **LAPLACEWCG() {
     if (cnt >= max1) {
         printf("Maximum number of iterations exceeded");
     }
+	 for (i = 0; i <= n; i++) {
+        for (j = 0; j <= m; j++) {
+            printf("U: \n %lf", U[i][j]);
+        }
+    }
     return U;
 }
 
 int main() {
+	
     LAPLACEWCG();
-
+	
     return 0;
 }
 
